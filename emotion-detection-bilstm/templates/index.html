@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Emotion Detection using Bidirectional LSTM — an NLP deep learning project.">
+  <title>EmotionAI — BiLSTM Emotion Detection</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="bg-orb orb-one"></div><div class="bg-orb orb-two"></div><div class="bg-grid"></div>
+
+  <nav class="nav">
+    <a class="brand" href="#top"><span class="brand-mark">E</span><span>Emotion<span class="brand-ai">AI</span></span></a>
+    <div class="nav-links">
+      <a href="#demo">Analyzer</a><a href="#gallery">Gallery</a><a href="#how">How it works</a><a href="#about">About</a>
+    </div>
+    <a class="github-btn" href="https://github.com/" target="_blank" rel="noopener">GitHub ↗</a>
+  </nav>
+
+  <header id="top" class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="pulse"></span> DEEP LEARNING · NLP · BILSTM</div>
+      <h1>Understand the <span>emotion</span><br>behind the words.</h1>
+      <p>EmotionAI uses a Bidirectional LSTM neural network to analyze text and estimate the emotion expressed in it.</p>
+      <div class="hero-actions"><a class="primary" href="#demo">Try the analyzer <span>↓</span></a><a class="secondary" href="#how">Explore the model</a></div>
+    </div>
+    <div class="hero-visual">
+      <div class="brain-card">
+        <div class="brain-glow"></div><div class="brain-icon">◉</div>
+        <div class="scan-line"></div>
+        <span class="node n1"></span><span class="node n2"></span><span class="node n3"></span><span class="node n4"></span>
+        <div class="brain-caption"><b>BiLSTM</b><small>context-aware sequence model</small></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="stats-wrap">
+      <div class="stats">
+        <div class="stat"><span>MODEL</span><b>{{ stats.model }}</b><small>Bidirectional architecture</small></div>
+        <div class="stat"><span>EMOTIONS</span><b>{{ stats.classes }}</b><small>Supported categories</small></div>
+        <div class="stat"><span>TEST ACCURACY</span><b>{{ stats.accuracy }}</b><small>From your trained model</small></div>
+        <div class="stat"><span>DATASET</span><b>{{ stats.size }}</b><small>Training records</small></div>
+      </div>
+    </section>
+
+    <section id="demo" class="section analyzer-section">
+      <div class="section-heading"><div><span class="eyebrow">LIVE ANALYZER</span><h2>What does your text feel like?</h2></div><div class="status"><span></span>{{ stats.status }}</div></div>
+      {% if error %}<div class="server-alert">{{ error }}</div>{% endif %}
+      <div class="analyzer-grid">
+        <div class="input-card glass">
+          <label for="text">Enter a sentence</label>
+          <textarea id="text" maxlength="1000" placeholder="I am really excited about my new project!"></textarea>
+          <div class="counter"><span id="count">0</span>/1000 characters</div>
+          <div class="suggestions"><span>Try an example</span>
+            <button class="chip" type="button" data-text="I am so happy that I finally completed my project!">Joy</button>
+            <button class="chip" type="button" data-text="I feel completely alone and disappointed today.">Sadness</button>
+            <button class="chip" type="button" data-text="This makes me so angry!">Anger</button>
+            <button class="chip" type="button" data-text="I am scared about what will happen.">Fear</button>
+            <button class="chip" type="button" data-text="I really love spending time with you.">Love</button>
+            <button class="chip" type="button" data-text="Wow, I never expected that to happen!">Surprise</button>
+          </div>
+          <button id="btn" class="analyze-btn"><span>Detect emotion</span><span>→</span></button>
+          <div id="msg" class="server-alert hidden"></div>
+        </div>
+
+        <div id="result" class="result-card glass hidden">
+          <div class="result-top"><div id="emoji" class="emotion-emoji">🙂</div><div><span class="eyebrow">PREDICTION</span><h3 id="emotion">—</h3><p id="description">—</p></div></div>
+          <div class="confidence"><div><span>Model confidence</span><b id="conf">0%</b></div><div class="confidence-track"><div id="confidence-fill"></div></div></div>
+          <div class="bars-title">Probability distribution</div><div id="bars"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="gallery" class="section">
+      <div class="section-heading"><div><span class="eyebrow">EMOTION GALLERY</span><h2>A visual map of six emotions.</h2></div><p>These categories are learned from the labels present in the training dataset.</p></div>
+      <div class="gallery">
+        <article class="emotion-tile joy"><div class="tile-icon">😊</div><div><span>01</span><h3>Joy</h3><p>Happiness, excitement and positive energy.</p></div><i>↗</i></article>
+        <article class="emotion-tile sadness"><div class="tile-icon">😢</div><div><span>02</span><h3>Sadness</h3><p>Disappointment, loneliness or low mood.</p></div><i>↗</i></article>
+        <article class="emotion-tile anger"><div class="tile-icon">😠</div><div><span>03</span><h3>Anger</h3><p>Frustration, irritation or conflict.</p></div><i>↗</i></article>
+        <article class="emotion-tile fear"><div class="tile-icon">😨</div><div><span>04</span><h3>Fear</h3><p>Worry, uncertainty or apprehension.</p></div><i>↗</i></article>
+        <article class="emotion-tile love"><div class="tile-icon">❤️</div><div><span>05</span><h3>Love</h3><p>Affection, care and emotional connection.</p></div><i>↗</i></article>
+        <article class="emotion-tile surprise"><div class="tile-icon">😲</div><div><span>06</span><h3>Surprise</h3><p>Amazement, unexpectedness or shock.</p></div><i>↗</i></article>
+      </div>
+    </section>
+
+    <section id="how" class="section how-section">
+      <div class="section-heading"><div><span class="eyebrow">THE PIPELINE</span><h2>From raw text to emotion.</h2></div></div>
+      <div class="pipeline-large">
+        <div class="pipe"><span>01</span><b>Clean</b><small>URLs, mentions & noise</small></div><div class="arrow">→</div>
+        <div class="pipe"><span>02</span><b>Tokenize</b><small>Words → integer sequences</small></div><div class="arrow">→</div>
+        <div class="pipe"><span>03</span><b>Embed</b><small>Tokens → dense vectors</small></div><div class="arrow">→</div>
+        <div class="pipe highlight"><span>04</span><b>BiLSTM</b><small>Context in both directions</small></div><div class="arrow">→</div>
+        <div class="pipe"><span>05</span><b>Softmax</b><small>One probability per class</small></div>
+      </div>
+      <div class="architecture glass"><div class="arch-label">MODEL ARCHITECTURE</div><div class="arch-flow"><span>Embedding · 128</span><b>→</b><span>BiLSTM · 64 × 2</span><b>→</b><span>Dropout · 0.5</span><b>→</b><span>Dense · 64</span><b>→</b><span>Softmax</span></div></div>
+    </section>
+
+    <section id="about" class="section about-section">
+      <div class="about-copy"><span class="eyebrow">ABOUT THE PROJECT</span><h2>A complete B.Tech CSE deep-learning project.</h2><p>This project combines NLP preprocessing, Keras/TensorFlow deep learning, Flask APIs and a responsive frontend. The training script saves the model, tokenizer and label encoder so the same pipeline can power the website.</p><div class="tech-list"><span>Python</span><span>TensorFlow</span><span>Keras</span><span>Flask</span><span>HTML/CSS/JS</span><span>Scikit-learn</span></div></div>
+      <div class="limitations glass"><span class="eyebrow">LIMITATIONS</span><h3>Read predictions responsibly.</h3><p>Sarcasm, slang, spelling errors, code-mixed language and ambiguous sentences can fool the model. It only predicts categories represented in its training data and can reflect dataset bias.</p><p class="disclaimer">This project detects patterns in text. It is not a medical or psychological diagnostic system.</p></div>
+    </section>
+  </main>
+
+  <footer><div class="brand"><span class="brand-mark">E</span><span>Emotion<span class="brand-ai">AI</span></span></div><p>Built with Python · TensorFlow · Flask · Vanilla JS</p><span>BiLSTM Emotion Detection · 2026</span></footer>
+
+<script>
+const EMOJI={joy:"😊",sadness:"😢",anger:"😠",fear:"😨",love:"❤️",surprise:"😲"};
+const COLOR={joy:"#f59e0b",sadness:"#3b82f6",anger:"#ef4444",fear:"#8b5cf6",love:"#ec4899",surprise:"#14b8a6"};
+const btn=document.getElementById("btn"),msg=document.getElementById("msg"),box=document.getElementById("text"),count=document.getElementById("count");
+const showError=t=>{msg.textContent=t;msg.classList.remove("hidden")};
+box.addEventListener("input",()=>count.textContent=box.value.length);
+document.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>{box.value=c.dataset.text;count.textContent=box.value.length;box.focus()}));
+box.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==="Enter")btn.click()});
+btn.addEventListener("click",async()=>{
+ msg.classList.add("hidden"); const text=box.value.trim();
+ if(!text){showError("Please enter some text.");return}
+ btn.disabled=true;btn.querySelector("span:first-child").textContent="Analyzing...";
+ try{
+  const res=await fetch("/predict",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text})});
+  const data=await res.json(); if(!res.ok){showError(data.error||"Something went wrong.");return}
+  const key=data.emotion.toLowerCase(); document.getElementById("result").classList.remove("hidden");
+  document.getElementById("emoji").textContent=data.meta?.emoji||EMOJI[key]||"🙂";
+  document.getElementById("emotion").textContent=data.emotion;
+  document.getElementById("description").textContent=data.meta?.description||"Predicted emotion from the trained model.";
+  document.getElementById("conf").textContent=data.confidence+"%";
+  document.getElementById("confidence-fill").style.width=Math.min(100,data.confidence)+"%";
+  const bars=document.getElementById("bars");bars.innerHTML="";
+  Object.entries(data.probabilities).sort((a,b)=>b[1]-a[1]).forEach(([label,p])=>{
+   const row=document.createElement("div");row.className="bar-row"+(label===data.emotion?" top":"");
+   row.innerHTML=`<div class="bar-head"><span>${label}</span><b>${p}%</b></div><div class="track"><div class="fill" style="width:${p}%;background:${COLOR[label.toLowerCase()]||"#6366f1"}"></div></div>`;
+   bars.appendChild(row);
+  });
+  document.getElementById("result").scrollIntoView({behavior:"smooth",block:"center"});
+ }catch(e){showError("Could not reach the server. Make sure Flask is running.")}finally{btn.disabled=false;btn.querySelector("span:first-child").textContent="Detect emotion"}
+});
+</script>
+</body>
+</html>
